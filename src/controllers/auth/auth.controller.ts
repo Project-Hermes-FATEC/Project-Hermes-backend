@@ -1,31 +1,31 @@
-import { Request, Response} from 'express'
+import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import User from '../../models/user.entity'
 import Token from '../../models/token.entity'
 
 export default class AuthController {
-    static async store (req: Request, res: Response){
-        const {name,email,password,phone} = req.body
+    static async store(req: Request, res: Response) {
+        const { name, email, password, phone } = req.body
 
-        if(!name) return res.status(400).json({error: "Nome obrigatório"})
-        if(!email) return res.status(400).json({error: "Email obrigatório"})
-        if(!password) return res.status(400).json({error: "Senha obrigatória"})
-        if(!phone) return res.status(400).json({error: "Telefone obrigatório"})
+        if (!name) return res.status(400).json({ error: "Nome obrigatório" })
+        if (!email) return res.status(400).json({ error: "Email obrigatório" })
+        if (!password) return res.status(400).json({ error: "Senha obrigatória" })
 
-          try {
+        try {
             const user = new User()
+
             user.name = name
             user.email = email
-            user.phone = phone // Salvando o telefone
+            user.phone = phone!
+            user.password = bcrypt.hashSync(password, 10)
 
-            user.password = bcrypt.hashSync(password,10)
             await user.save()
 
             return res.json({
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone // Retornando o telefone no response
+                phone: user.phone
             })
         } catch (error) {
             console.error(error)
@@ -33,86 +33,95 @@ export default class AuthController {
         }
     }
 
-    static async login (req: Request, res: Response) {
-        const { email, password, phone } = req.body // Adicionando a opção de login com telefone
+    static async login(req: Request, res: Response) {
+        const { email, password } = req.body
 
-        try {
-            let user;
+        if (!email || !password) return res.status(400).json({ error: "Email e senha são obrigatórios" })
 
-            if(!email && !phone) return res.status(400).json({error: 'Email ou telefone é obrigatório!'})
+        const user = await User.findOneBy({ email })
+        if (!user) return res.status(401).json({ error: "Usuário ou senha inválida" })
 
-            if (email) {
-                user = await User.findOneBy({email})
-            } else {
-                user = await User.findOneBy({phone})
-            }
+        const passwCheck = await bcrypt.compareSync(password, user.password)
+        if (!passwCheck) return res.status(401).json({ error: "Usuário ou senha inválida" })
 
-            if(!user) return res.status(401).json({error: 'Usuário não encontrado!'})
+        await Token.delete({ user: { id: user.id } })
 
-            const passwCheck = bcrypt.compareSync(password, user.password)
-            if(!passwCheck) return res.status(401).json({error: 'Senha inválida!'})
+        const token = new Token()
+        const stringRand = user.id + new Date().toString()
+        token.token = bcrypt.hashSync(stringRand, 1).slice(-20)
+        token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+        token.refreshToken = bcrypt.hashSync(stringRand + 2, 1).slice(-20)
 
-            await Token.delete({user: {id: user.id}})
+        token.user = user
+        await token.save()
 
-            const token = new Token()
-            const stringRand = Math.random().toString(36)
-            token.token = bcrypt.hashSync(stringRand,1).slice(-20)
-            token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
-            token.refreshToken = bcrypt.hashSync(stringRand+2,1).slice(-20)
-            token.user = user
-            await token.save()
-
-            return res.json ({
-                token: token.token,
-                expiresAt: token.expiresAt,
-                refreshToken: token.refreshToken
-            })
-        } catch (error) {
-            console.error(error)
-            return res.status(500).json({ error: 'Erro interno do servidor' })
-        }
+        res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' });
+        return res.json({
+            name: token.user.name,
+            email: email,
+            token: token.token,
+            expiresAt: token.expiresAt,
+            refreshToken: token.refreshToken
+        })
     }
+
     static async refresh(req: Request, res: Response) {
-      const { authorization } = req.headers
-  
-      if (!authorization) return res.status(400).json({ error: 'O refresh token é obrigatório' })
-  
-      try {
-          const token = await Token.findOneBy({ refreshToken: authorization })
-          if (!token) return res.status(401).json({ error: 'Refresh token inválido' })
-  
-          if (token.expiresAt < new Date()) {
-              await token.remove()
-              return res.status(401).json({ error: 'Refresh token expirado' })
-          }
-  
-          const stringRand = Math.random().toString(36)
-          token.token = bcrypt.hashSync(stringRand, 1).slice(-20)
-          token.refreshToken = bcrypt.hashSync(stringRand + 2, 1).slice(-20)
-          token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
-          await token.save()
-  
-          return res.json({
-              token: token.token,
-              expiresAt: token.expiresAt,
-              refreshToken: token.refreshToken
-          })
-      } catch (error) {
-          console.error(error)
-          return res.status(500).json({ error: 'Erro interno do servidor' })
-      }
-  }
-    static async logout (req: Request, res: Response) {
-        const { authorization } = req.headers
-        
-        if (!authorization) return res.status(400).json({ error: 'O token é obrigatório' })
-    
-        const userToken = await Token.findOneBy({ token: authorization })
+        const { token } = req.cookies;
+
+        if (!token) return res.status(400).json({ error: 'O refresh token é obrigatório' });
+
+        const authorization = await Token.findOneBy({ refreshToken: token });
+        if (!authorization) return res.status(401).json({ error: 'Refresh token inválido' });
+
+        if (authorization.expiresAt < new Date()) {
+            await token.remove();
+            return res.status(401).json({ error: 'Refresh token expirado' });
+        }
+
+        authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
+        authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
+        authorization.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+        authorization.userId;
+
+        await authorization.save();
+
+        res.cookie('token', authorization.token, { httpOnly: true, secure: true, sameSite: 'none' })
+        return res.json({
+            token: authorization.token,
+            expiresAt: authorization.expiresAt,
+            refreshToken: authorization.refreshToken
+        });
+    }
+
+    static async logout(req: Request, res: Response) {
+        const { token } = req.cookies
+
+        if (!token) return res.status(400).json({ error: 'O token é obrigatório' })
+
+        const userToken = await Token.findOneBy({ token: token })
         if (!userToken) return res.status(401).json({ error: 'Token inválido' })
-    
+
         await userToken.remove()
-    
+
+        res.clearCookie('token')
+
         return res.status(204).json()
-      }
-    
+    }
+
+    static async verify(req: Request, res: Response) {
+        const { token } = req.cookies
+
+        if (!token) return res.status(400).json({ error: 'O token é obrigatório' })
+
+        const userToken = await Token.findOneBy({ token: token })
+        if (!userToken) return res.status(401).json({ error: 'Token inválido' })
+
+        if (userToken.expiresAt < new Date()) {
+            await token.remove()
+            return res.status(401).json({ error: 'Token expirado' })
+        }
+
+
+        return res.status(200).json()
+    }
 }
