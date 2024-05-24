@@ -117,7 +117,7 @@ export default class AuthController {
         if (!userToken) return res.status(401).json({ error: 'Token inválido' })
 
         if (userToken.expiresAt < new Date()) {
-            await token.remove()
+            await userToken.remove()
             return res.status(401).json({ error: 'Token expirado' })
         }
 
