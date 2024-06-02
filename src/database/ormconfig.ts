@@ -6,7 +6,7 @@ const dataBase = new DataSource({
     logging: true,
     synchronize: true,
     entities: [
-        join(__dirname,'..','models/*.{ts,js}')
+        join(__dirname,'..','models/**/*.{ts,js}')
     ]
 })
 
@@ -14,8 +14,8 @@ dataBase.initialize()
 .then(() => {
     console.log('Banco de dados iniciado!')
 })
-.catch(() => {
-    console.log('Falha ao inciar o banco de dados!')
+.catch((err) => {
+    console.log('Falha ao inciar o banco de dados!', err)
 })
 
 export default dataBase

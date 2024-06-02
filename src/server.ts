@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000
 
 app.use(cookieParser())
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: ['http://localhost:5173', 'http://localhost:3000', 'https://project-hermes-6cwg.onrender.com/'],
     credentials: true
 }));
 app.use(express.json())

@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const checklistItem_entity_1 = __importDefault(require("./checklistItem.entity"));
-const product_entity_1 = __importDefault(require("./product.entity"));
-const sales_entity_1 = __importDefault(require("./sales.entity"));
 let Checklist = class Checklist extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -31,21 +29,9 @@ __decorate([
     __metadata("design:type", String)
 ], Checklist.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: false }),
-    __metadata("design:type", Boolean)
-], Checklist.prototype, "completed", void 0);
-__decorate([
     (0, typeorm_1.OneToMany)(() => checklistItem_entity_1.default, item => item.checklist, { cascade: true }),
     __metadata("design:type", Array)
 ], Checklist.prototype, "items", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => product_entity_1.default, product => product.checklist),
-    __metadata("design:type", product_entity_1.default)
-], Checklist.prototype, "product", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => sales_entity_1.default, sales => sales.checklist),
-    __metadata("design:type", sales_entity_1.default)
-], Checklist.prototype, "sales", void 0);
 Checklist = __decorate([
     (0, typeorm_1.Entity)()
 ], Checklist);

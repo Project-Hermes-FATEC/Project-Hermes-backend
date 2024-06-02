@@ -8,14 +8,14 @@ const dataBase = new typeorm_1.DataSource({
     logging: true,
     synchronize: true,
     entities: [
-        (0, path_1.join)(__dirname, '..', 'models/*.{ts,js}')
+        (0, path_1.join)(__dirname, '..', 'models/**/*.{ts,js}')
     ]
 });
 dataBase.initialize()
     .then(() => {
     console.log('Banco de dados iniciado!');
 })
-    .catch(() => {
-    console.log('Falha ao inciar o banco de dados!');
+    .catch((err) => {
+    console.log('Falha ao inciar o banco de dados!', err);
 });
 exports.default = dataBase;

@@ -13,34 +13,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const user_entity_1 = __importDefault(require("./user/user.entity"));
-let Token = class Token extends typeorm_1.BaseEntity {
+const checklistItem_entity_1 = __importDefault(require("./checklistItem.entity"));
+const checklistSales_1 = __importDefault(require("../sales/checklistSales"));
+let StepVerify = class StepVerify extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Token.prototype, "id", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Token.prototype, "token", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Token.prototype, "refreshToken", void 0);
+], StepVerify.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Date)
-], Token.prototype, "expiresAt", void 0);
+], StepVerify.prototype, "dateCompleted", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
-], Token.prototype, "userId", void 0);
+    (0, typeorm_1.Column)({ type: 'blob' }),
+    __metadata("design:type", Blob)
+], StepVerify.prototype, "image", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.default, user => user.tokens),
-    __metadata("design:type", user_entity_1.default)
-], Token.prototype, "user", void 0);
-Token = __decorate([
+    (0, typeorm_1.ManyToOne)(() => checklistSales_1.default, checklistsales => checklistsales.id),
+    __metadata("design:type", checklistSales_1.default)
+], StepVerify.prototype, "checklistsales", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)(() => checklistItem_entity_1.default),
+    __metadata("design:type", checklistItem_entity_1.default)
+], StepVerify.prototype, "checklist", void 0);
+StepVerify = __decorate([
     (0, typeorm_1.Entity)()
-], Token);
-exports.default = Token;
+], StepVerify);
+exports.default = StepVerify;
