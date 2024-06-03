@@ -53,7 +53,8 @@ export default class UserController {
 
     static async update(req: Request, res: Response){
         const { userId } = req.headers;
-        const { id, email, phone, type } = req.body;
+        const { id } = req.params;
+        const { email, phone, type } = req.body;
 
         if(!userId) return res.status(400).json({error: 'O user id é obrigatório!'});
 
@@ -82,6 +83,22 @@ export default class UserController {
 
         const passCheck = await bcrypt.compareSync(oldpass, user.password);
         if(!passCheck) return res.status(401).json({ error: 'Senha antiga está incorreta!' });
+
+        user.password = bcrypt.hashSync(newpass, 10)
+        await user.save();
+
+        return res.status(200);
+    }
+
+    static async resetPassword(req: Request, res: Response){
+        const { id } = req.params;
+        const { newpass } = req.body;
+
+        if(!newpass) return res.status(400).json({ error: 'Preencha a senha!'});
+
+        const user = await User.findOneBy({ id: Number(id) });
+
+        if(!user) return res.status(401).json({ error: 'Usuário não encontrado!' });
 
         user.password = bcrypt.hashSync(newpass, 10)
         await user.save();
