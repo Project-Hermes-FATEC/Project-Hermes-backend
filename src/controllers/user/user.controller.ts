@@ -93,16 +93,15 @@ export default class UserController {
     static async resetPassword(req: Request, res: Response){
         const { id } = req.params;
         const { newpass } = req.body;
-
-        if(!newpass) return res.status(400).json({ error: 'Preencha a senha!'});
+        const defaultPassword = 'JohnDeere2023'
 
         const user = await User.findOneBy({ id: Number(id) });
 
         if(!user) return res.status(401).json({ error: 'Usuário não encontrado!' });
 
-        user.password = bcrypt.hashSync(newpass, 10)
+        user.password = bcrypt.hashSync(newpass?? defaultPassword, 10)
         await user.save();
 
-        return res.status(200);
+        return res.status(200).json();
     }
 }
