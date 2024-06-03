@@ -4,9 +4,13 @@ import bcrypt from 'bcrypt'
 
 export default class UserController {
     static async store(req: Request, res: Response) {
-        const { name, email, password, phone, type } = req.body;
+        const { name, email, password, phone, type, userId } = req.body;
 
-        if (!name || !email || !password || !phone) return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
+        if (!name || !email || !password || !userId || !type) return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
+        
+        const userIdCheck = await User.findOneBy({ userId });
+
+        if(userIdCheck) return res.status(400).json({ error: "User ID já está cadastrado!" });
 
         try {
             const user = new User();
@@ -15,16 +19,12 @@ export default class UserController {
             user.email = email;
             user.phone = phone;
             user.password = bcrypt.hashSync(password, 10);
-            user.userId = 'ABC124';
+            user.userId = userId;
+            user.type = type ?? user.type
 
             await user.save()
 
-            return res.json({
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone
-            });
+            return res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
         } catch (error) {
             console.error(error)
             return res.status(500).json({ error: 'Erro interno do servidor' })
@@ -41,6 +41,14 @@ export default class UserController {
         if(!user) return res.status(400).json({error: 'Usuário não encontrado!'})
 
         return res.status(201).json({ user: { name: user.name, email: user.email, phone: user.phone }})
+    }
+
+    static async showAll(req: Request, res: Response){
+        const user = await User.find();
+
+        if(!user) return res.status(400).json({error: 'Nenhum usuário encontrado!'})
+
+        return res.status(201).json(user);
     }
 
     static async update(req: Request, res: Response){

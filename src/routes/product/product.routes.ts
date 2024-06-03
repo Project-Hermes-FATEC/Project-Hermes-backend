@@ -4,8 +4,8 @@ import ProductController from '../../controllers/product/product.controller';
 
 const productRoutes = Router();
 
-productRoutes.get('/', ProductController.get);
-productRoutes.post('/', ProductController.store);
+productRoutes.get('/', authMiddleware, ProductController.get);
+productRoutes.post('/', authMiddleware, ProductController.store);
 productRoutes.put('/', authMiddleware, ProductController.update);
 
 export default productRoutes

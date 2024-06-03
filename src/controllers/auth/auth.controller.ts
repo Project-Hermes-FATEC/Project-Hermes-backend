@@ -27,12 +27,10 @@ export default class AuthController {
         await token.save()
 
         res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' });
-        return res.json({
-            name: token.user.name,
-            email: email,
-            token: token.token,
-            expiresAt: token.expiresAt,
-            refreshToken: token.refreshToken
+        return res.status(200).json({
+            name: user.name,
+            email: user.email,
+            type: user.type,
         })
     }
 
@@ -52,7 +50,6 @@ export default class AuthController {
         authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
         authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
         authorization.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-        authorization.userId;
 
         await authorization.save();
 
@@ -65,7 +62,7 @@ export default class AuthController {
     }
 
     static async logout(req: Request, res: Response) {
-        const { token } = req.cookies
+        const { token } = req.cookies;
 
         if (!token) return res.status(400).json({ error: 'O token é obrigatório' })
 
@@ -84,7 +81,7 @@ export default class AuthController {
 
         if (!token) return res.status(400).json({ error: 'O token é obrigatório' })
 
-        const userToken = await Token.findOneBy({ token: token })
+        const userToken = await Token.findOne({ where: {token: token}, relations: ['user'] })
         if (!userToken) return res.status(401).json({ error: 'Token inválido' })
 
         if (userToken.expiresAt < new Date()) {
@@ -92,7 +89,6 @@ export default class AuthController {
             return res.status(401).json({ error: 'Token expirado' })
         }
 
-
-        return res.status(200).json()
+        return res.status(200).json(userToken.user.type)
     }
 }

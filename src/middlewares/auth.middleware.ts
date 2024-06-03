@@ -6,7 +6,7 @@ export default async function authMiddleware (req: Request, res: Response, next:
 
   if (!token) return res.status(401).json({ error: 'Token não informado' })
 
-  const userToken = await Token.findOneBy({ token: token })
+  const userToken = await Token.findOne({ where: { token: token }, relations: ['user']})
   if (!userToken) return res.status(401).json({ error: 'Token inválido' })
 
   if (userToken.expiresAt < new Date()) {
@@ -14,7 +14,7 @@ export default async function authMiddleware (req: Request, res: Response, next:
     return res.status(401).json({ error: 'Token expirado' })
   }
 
-  req.headers.userId = userToken.userId.toString()
+  req.headers.userId = userToken.user.id.toString()
 
   next()
 }

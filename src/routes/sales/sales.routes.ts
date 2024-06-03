@@ -4,7 +4,7 @@ import SalesController from '../../controllers/sales/sales.controller';
 
 const salesRouter = Router();
 
-salesRouter.post('/:productId', SalesController.create);
-salesRouter.get('/', SalesController.get);
+salesRouter.post('/:productId', authMiddleware, SalesController.create);
+salesRouter.get('/', authMiddleware, SalesController.get);
 
 export default salesRouter

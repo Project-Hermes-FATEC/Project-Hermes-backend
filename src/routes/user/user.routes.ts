@@ -4,8 +4,9 @@ import authMiddleware from '../../middlewares/auth.middleware'
 
 const userRoutes = Router()
 
-userRoutes.post('/', UserController.store);
+userRoutes.post('/', authMiddleware, UserController.store);
 userRoutes.get('/', authMiddleware, UserController.get);
+userRoutes.get('/admin', authMiddleware, UserController.showAll);
 userRoutes.put('/', authMiddleware, UserController.update);
 userRoutes.put('/changePass', authMiddleware, UserController.changePass);
 
