@@ -20,7 +20,7 @@ export default class AuthController {
         const token = new Token()
         const stringRand = user.id + new Date().toString()
         token.token = bcrypt.hashSync(stringRand, 1).slice(-20)
-        token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+        token.expiresAt = new Date(Date.now() + 1 * 30 * 1000)
         token.refreshToken = bcrypt.hashSync(stringRand + 2, 1).slice(-20)
 
         token.user = user
@@ -40,16 +40,17 @@ export default class AuthController {
 
         if (!token) return res.status(400).json({ error: 'O refresh token é obrigatório' });
 
-        const authorization = await Token.findOneBy({ token: token });
+        const authorization = await Token.findOneBy({ token });
+
         if (!authorization) return res.status(401).json({ error: 'Refresh token inválido' });
 
         if (authorization.expiresAt > new Date()) {
             return res.status(401).json({ error: 'Refresh token ainda está disponível' });
         }
 
-/*         authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
-        authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20); */
-        authorization.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+        authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
+        authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
+        authorization.expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
         await authorization.save();
 
