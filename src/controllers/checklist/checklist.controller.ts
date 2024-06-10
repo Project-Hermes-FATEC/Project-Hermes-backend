@@ -44,6 +44,14 @@ export default class ChecklistController {
         return res.status(201).json(checklist);
     }
 
+    static async show(req: Request, res: Response){
+        const checklists = await Checklist.find({ relations: ['items'] })
+
+        if(!checklists) return res.status(400).json({error: 'Não encontrado nenhuma checklist'})
+
+        return res.status(200).json(checklists); 
+    }
+
     /*   
       static async delete(req: Request, res: Response) {
           const { id } = req.params

@@ -31,6 +31,7 @@ export default class AuthController {
             name: user.name,
             email: user.email,
             type: user.type,
+            userId: user.userId
         })
     }
 
@@ -39,26 +40,21 @@ export default class AuthController {
 
         if (!token) return res.status(400).json({ error: 'O refresh token é obrigatório' });
 
-        const authorization = await Token.findOneBy({ refreshToken: token });
+        const authorization = await Token.findOneBy({ token: token });
         if (!authorization) return res.status(401).json({ error: 'Refresh token inválido' });
 
-        if (authorization.expiresAt < new Date()) {
-            await token.remove();
-            return res.status(401).json({ error: 'Refresh token expirado' });
+        if (authorization.expiresAt > new Date()) {
+            return res.status(401).json({ error: 'Refresh token ainda está disponível' });
         }
 
-        authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
-        authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
+/*         authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
+        authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20); */
         authorization.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
         await authorization.save();
 
         res.cookie('token', authorization.token, { httpOnly: true, secure: true, sameSite: 'none' })
-        return res.json({
-            token: authorization.token,
-            expiresAt: authorization.expiresAt,
-            refreshToken: authorization.refreshToken
-        });
+        return res.status(200).json('O token foi atualizado');
     }
 
     static async logout(req: Request, res: Response) {

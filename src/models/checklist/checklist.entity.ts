@@ -13,5 +13,5 @@ export default class Checklist extends BaseEntity {
     description!: string
 
     @OneToMany(() => ChecklistItem, item => item.checklist)
-    items?: ChecklistItem[]
+    items!: ChecklistItem[]
 }
