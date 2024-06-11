@@ -20,7 +20,7 @@ export default class AuthController {
         const token = new Token()
         const stringRand = user.id + new Date().toString()
         token.token = bcrypt.hashSync(stringRand, 1).slice(-20)
-        token.expiresAt = new Date(Date.now() + 1 * 30 * 1000)
+        token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
         token.refreshToken = bcrypt.hashSync(stringRand + 2, 1).slice(-20)
 
         token.user = user
@@ -50,7 +50,7 @@ export default class AuthController {
 
         authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
         authorization.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
-        authorization.expiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        authorization.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
         await authorization.save();
 
