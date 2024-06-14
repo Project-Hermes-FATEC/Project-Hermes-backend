@@ -65,7 +65,7 @@ export default class AuthController {
         if (!token) return res.status(400).json({ error: 'O token é obrigatório' })
 
         const userToken = await Token.findOneBy({ token: token })
-        if (!userToken) return res.status(401).json({ error: 'Token inválido' })
+        if (!userToken) return res.status(400).json({ error: 'Token inválido' })
 
         await userToken.remove()
 
