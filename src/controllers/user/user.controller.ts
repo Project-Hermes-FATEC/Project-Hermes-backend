@@ -71,6 +71,24 @@ export default class UserController {
         return res.status(200).json(user);
     }
 
+    static async uploadImagte(req: Request, res: Response){
+        const { userId } = req.headers;
+        const { profilePic } = req.body; 
+
+        if(!profilePic) return res.status(400).json({error: 'Uma imagem é obrigatória'});
+        if(!userId) return res.status(400).json({error: 'O user id é obrigatório!'});
+
+        const user = await User.findOneBy({ id: Number(userId) });
+
+        if(!user) return res.status(400).json({error: 'Usuário não encontrado'});
+
+        user.profile = profilePic;
+
+        user.save();
+
+        return res.status(200).json();
+    }
+
     static async changePass(req: Request, res: Response){
         const { userId } = req.headers;
         const { oldpass, newpass } = req.body;

@@ -18,6 +18,9 @@ export default class User extends BaseEntity {
     @Column()
     email!: string
 
+    @Column({type: 'blob', nullable: true})
+    profile?: Blob
+
     @Column()
     password!: string
 
