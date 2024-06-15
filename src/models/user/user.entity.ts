@@ -24,7 +24,7 @@ export default class User extends BaseEntity {
     @Column()
     password!: string
 
-    @Column()
+    @Column({ nullable: true })
     phone?: string
 
     @OneToMany(() => Token, token => token.user)

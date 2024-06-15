@@ -8,12 +8,12 @@ export default class UserController {
         const password = bcrypt.hashSync('JohnDeere123', 10);
         const userId = 'ADMIN1';
         const type = 'admin';
-        const email = 'admin@adminh';
+        const email = 'admin@admin';
 
         const checkUser = await User.findOneBy({ userId: userId });
 
         if(!checkUser) {
-            const admin = new User;
+            const admin = new User();
             
             admin.name = name;
             admin.password = password;
