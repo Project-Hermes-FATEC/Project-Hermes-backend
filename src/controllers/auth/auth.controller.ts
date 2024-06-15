@@ -43,10 +43,10 @@ export default class AuthController {
 
         const authorization = await Token.findOneBy({ token });
 
-        if (!authorization) return res.status(401).json({ error: 'Refresh token inválido' });
+        if (!authorization) return res.status(400).json({ error: 'Refresh token inválido' });
 
         if (authorization.expiresAt > new Date()) {
-            return res.status(401).json({ error: 'Refresh token ainda está disponível' });
+            return res.status(304).json({ error: 'Refresh token ainda está disponível' });
         }
 
         authorization.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20);
