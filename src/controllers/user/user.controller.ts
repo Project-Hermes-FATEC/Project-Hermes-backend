@@ -3,6 +3,28 @@ import User from '../../models/user/user.entity';
 import bcrypt from 'bcrypt'
 
 export default class UserController {
+    static async setup(){
+        const name = 'admin';
+        const password = 'JohnDeere123';
+        const userId = 'ADMIN1';
+        const type = 'admin';
+        const email = 'admin@adminh';
+
+        const checkUser = await User.findOneBy({ userId: userId });
+
+        if(!checkUser) {
+            const admin = new User;
+            
+            admin.name = name;
+            admin.password = password;
+            admin.userId = userId;
+            admin.type = type;
+            admin.email = email;
+
+            admin.save();
+        }
+     }
+
     static async store(req: Request, res: Response) {
         const { name, email, password, phone, type, userId } = req.body;
 

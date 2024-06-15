@@ -44,7 +44,27 @@ export default class ChecklistController {
         return res.status(201).json(checklist);
     }
 
-    static async show(req: Request, res: Response){
+    static async addItem(req: Request, res: Response) {
+        const { id } = req.params;
+        const { description } = req.body;
+
+        if(!id || !description) return res.status(400).json({ error: 'Preencha todos os campos!' });
+
+        const checklist = await Checklist.findOneBy({ id: Number(id) });
+
+        if(!checklist) return res.status(400).json({ error: 'Checklist não existe' });
+
+        const item = new ChecklistItem();
+
+        item.description = description;
+        item.checklist = checklist;
+
+        item.save();
+
+        return res.status(201).json(item);
+    }
+
+    static async show(req: Request, res: Response) {
         const checklists = await Checklist.find({ relations: ['items'] })
 
         if(!checklists) return res.status(400).json({error: 'Não encontrado nenhuma checklist'})
