@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 export default class UserController {
     static async setup(){
         const name = 'admin';
-        const password = 'JohnDeere123';
+        const password = bcrypt.hashSync('JohnDeere123', 10);
         const userId = 'ADMIN1';
         const type = 'admin';
         const email = 'admin@adminh';
