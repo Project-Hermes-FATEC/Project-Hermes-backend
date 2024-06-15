@@ -13,34 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const user_entity_1 = __importDefault(require("./user/user.entity"));
-let Token = class Token extends typeorm_1.BaseEntity {
+const checklist_entity_1 = __importDefault(require("./checklist.entity"));
+let ChecklistItem = class ChecklistItem extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Token.prototype, "id", void 0);
+], ChecklistItem.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Token.prototype, "token", void 0);
+], ChecklistItem.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Token.prototype, "refreshToken", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Date)
-], Token.prototype, "expiresAt", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
-], Token.prototype, "userId", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.default, user => user.tokens),
-    __metadata("design:type", user_entity_1.default)
-], Token.prototype, "user", void 0);
-Token = __decorate([
+    (0, typeorm_1.ManyToOne)(() => checklist_entity_1.default, checklist => checklist.items),
+    __metadata("design:type", checklist_entity_1.default)
+], ChecklistItem.prototype, "checklist", void 0);
+ChecklistItem = __decorate([
     (0, typeorm_1.Entity)()
-], Token);
-exports.default = Token;
+], ChecklistItem);
+exports.default = ChecklistItem;

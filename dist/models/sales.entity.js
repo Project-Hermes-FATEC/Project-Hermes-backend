@@ -13,40 +13,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const checklistItem_entity_1 = __importDefault(require("./checklistItem.entity"));
+const checklist_entity_1 = __importDefault(require("./checklist.entity"));
 const product_entity_1 = __importDefault(require("./product.entity"));
-const sales_entity_1 = __importDefault(require("./sales.entity"));
-let Checklist = class Checklist extends typeorm_1.BaseEntity {
+const user_entity_1 = __importDefault(require("./user/user.entity"));
+let Sales = class Sales extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Checklist.prototype, "id", void 0);
+], Sales.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Checklist.prototype, "title", void 0);
+    (0, typeorm_1.OneToOne)(() => user_entity_1.default, user => user.userId),
+    __metadata("design:type", user_entity_1.default)
+], Sales.prototype, "userIdSeller", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Checklist.prototype, "description", void 0);
+    (0, typeorm_1.OneToOne)(() => user_entity_1.default, user => user.userId),
+    __metadata("design:type", user_entity_1.default)
+], Sales.prototype, "userIdTec", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: false }),
-    __metadata("design:type", Boolean)
-], Checklist.prototype, "completed", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => checklistItem_entity_1.default, item => item.checklist, { cascade: true }),
-    __metadata("design:type", Array)
-], Checklist.prototype, "items", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => product_entity_1.default, product => product.checklist),
+    (0, typeorm_1.ManyToOne)(() => product_entity_1.default, product => product.id),
     __metadata("design:type", product_entity_1.default)
-], Checklist.prototype, "product", void 0);
+], Sales.prototype, "product", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => sales_entity_1.default, sales => sales.checklist),
-    __metadata("design:type", sales_entity_1.default)
-], Checklist.prototype, "sales", void 0);
-Checklist = __decorate([
+    (0, typeorm_1.OneToOne)(() => checklist_entity_1.default, checklist => checklist.sales, { cascade: true }),
+    __metadata("design:type", Array)
+], Sales.prototype, "checklist", void 0);
+Sales = __decorate([
     (0, typeorm_1.Entity)()
-], Checklist);
-exports.default = Checklist;
+], Sales);
+exports.default = Sales;
