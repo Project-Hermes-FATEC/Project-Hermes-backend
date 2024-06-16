@@ -11,6 +11,6 @@ userRoutes.get('/', authMiddleware, UserController.get);
 userRoutes.get('/admin', authMiddleware, UserController.showAll);
 userRoutes.put('/:id', authMiddleware, UserController.update);
 userRoutes.get('/resetPass/:id', authMiddleware, UserController.resetPassword);
-userRoutes.put('/changePass', authMiddleware, UserController.changePass);
+userRoutes.post('/changePass', authMiddleware, UserController.changePass);
 
 export default userRoutes

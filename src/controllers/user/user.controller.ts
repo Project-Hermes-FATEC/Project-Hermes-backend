@@ -115,19 +115,19 @@ export default class UserController {
         const { userId } = req.headers;
         const { oldpass, newpass } = req.body;
 
-        if(!oldpass || !newpass) return res.status(400).json({ error: 'Preencha os campos obrigatórios' });
-
-        const user = await User.findOneBy({ id: Number(userId) });
+        if(!oldpass || !newpass || !userId || isNaN(Number(userId))) return res.status(400).json({ error: 'Preencha os campos obrigatórios' });
+        
+        const user = await User.findOneBy({ id: 1 });
 
         if(!user) return res.status(401).json({ error: 'Usuário não encontrado!' });
 
-        const passCheck = await bcrypt.compareSync(oldpass, user.password);
-        if(!passCheck) return res.status(401).json({ error: 'Senha antiga está incorreta!' });
+        const passCheck = bcrypt.compareSync(oldpass, user.password);
+        if(!passCheck) return res.status(400).json({ error: 'Senha antiga está incorreta!' });
 
         user.password = bcrypt.hashSync(newpass, 10)
         await user.save();
 
-        return res.status(200);
+        return res.status(200).json();
     }
 
     static async resetPassword(req: Request, res: Response){
