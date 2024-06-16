@@ -7,8 +7,8 @@ const checklistRoutes = Router();
 checklistRoutes.post('/', authMiddleware, ChecklistController.store);
 checklistRoutes.post('/item/:id', authMiddleware, ChecklistController.addItem);
 checklistRoutes.get('/', authMiddleware, ChecklistController.show);
-/*checklistRoutes.get('/:id', authMiddleware, ChecklistController.show)
-checklistRoutes.delete('/:id', authMiddleware, ChecklistController.delete)
-checklistRoutes.put('/:id', authMiddleware, ChecklistController.update) */
+checklistRoutes.put('/:checkListId/:itemId', authMiddleware, ChecklistController.updateItem);
+checklistRoutes.delete('/:checkListId/:itemId', authMiddleware, ChecklistController.deleteItem);
+checklistRoutes.delete('/:id', authMiddleware, ChecklistController.delete);
 
 export default checklistRoutes  
