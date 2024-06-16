@@ -12,6 +12,6 @@ export default class Checklist extends BaseEntity {
     @Column()
     description!: string
 
-    @OneToMany(() => ChecklistItem, item => item.checklist)
-    items!: ChecklistItem[]
+    @OneToMany(() => ChecklistItem, item => item.checklist, { onDelete: "CASCADE" })
+    items?: ChecklistItem[]
 }
