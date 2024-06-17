@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import Product from '../../models/product.entity';
+import Checklist from '../../models/checklist/checklist.entity';
 
 export default class ProductController {
     static async get(req: Request, res: Response){
@@ -11,16 +12,19 @@ export default class ProductController {
     }
 
     static async store(req: Request, res: Response) {
-        const { name, description, type, image } = req.body;
+        const { name, description, type, image, checklist } = req.body;
 
         if (!name || !type || !description) return res.status(400).json({ error: "Todos os campos são obrigatórios" });
-        
+
+        const check = checklist ?? await Checklist.findOneBy({ id: Number(checklist.id) })
+
         const product = new Product();
 
         product.name = name;
         product.description = description;
         product.type = type;
-        product.image = image;
+        product.image = image ?? image;
+        product.checklist = check ?? check; 
 
         await product.save()
 

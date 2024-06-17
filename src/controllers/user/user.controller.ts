@@ -78,22 +78,23 @@ export default class UserController {
         const { id } = req.params;
         const { email, phone, type } = req.body;
 
+        if(!email && !phone && !type) return res.status(400).json({error: 'Preencha pelo menos um campo!'});
         if(!userId) return res.status(400).json({error: 'O user id é obrigatório!'});
 
-        const user = await User.findOneBy({ id: Number(id)?? Number(userId) });
+        const user = await User.findOneBy({ id: Number(id) ? Number(id) : Number(userId) });
 
         if(!user) return res.status(400).json({error: 'Usuário não encontrado'});
         
-        user.email = email?? user.email;
-        user.phone = phone?? user.phone;
-        user.type = type?? user.type; 
+        user.email = email ? email : user.email;
+        user.phone = phone ? phone : user.phone;
+        user.type = type ? type : user.type; 
         
-        user.save();
+        await user.save();
 
         return res.status(200).json(user);
     }
 
-    static async uploadImagte(req: Request, res: Response){
+    static async uploadImage(req: Request, res: Response){
         const { userId } = req.headers;
         const { profilePic } = req.body; 
 
