@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm"
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn, ManyToOne } from "typeorm"
 import Checklist from "./checklist/checklist.entity"
 
 @Entity()
@@ -18,7 +18,7 @@ export default class Product extends BaseEntity {
     @Column('blob', {nullable: true})
     image?: Blob
 
-    @OneToOne(() => Checklist)
+    @ManyToOne(() => Checklist, { nullable: true })
     @JoinColumn()
     checklist!: Checklist
 }

@@ -6,6 +6,6 @@ const productRoutes = Router();
 
 productRoutes.get('/', authMiddleware, ProductController.get);
 productRoutes.post('/', authMiddleware, ProductController.store);
-productRoutes.put('/', authMiddleware, ProductController.update);
+productRoutes.put('/:id', authMiddleware, ProductController.update);
 
 export default productRoutes
