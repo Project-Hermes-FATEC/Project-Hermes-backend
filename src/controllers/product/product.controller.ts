@@ -6,7 +6,7 @@ export default class ProductController {
     static async get(req: Request, res: Response) {
         const products = await Product.find({ relations: ['checklist.items'] });
 
-        if (!products) res.status(400).json({ error: 'Nenhum produto cadastrado' });
+        if (!products) res.status(200).json();
 
         return res.status(201).json(products);
     }
@@ -45,16 +45,30 @@ export default class ProductController {
 
         if (!product) return res.status(400).json({ error: 'Nenhum produto encontrado!' });
 
-        /*         const findChecklist = await Checklist.findOneBy({ id: checklist.id ?? checklist.id });
-         */
-        product.name = name ?? product.name;
-        product.description = description ?? product.description;
-        product.type = type ?? product.type;
-        product.image = image ?? product.image;
-        /*         product.checklist = findChecklist ? findChecklist : product.checklist;
-         */
+        const findChecklist = await Checklist.findOneBy({ id: checklist.id ?? checklist.id });
+        
+        product.name = name ? name : product.name;
+        product.description = description ? description : product.description;
+        product.type = type ? type : product.type;
+        product.image = image ? image : product.image;
+        product.checklist = findChecklist ? findChecklist : product.checklist;
+        
 
         await product.save();
+
+        return res.status(200).json();
+    }
+
+    static async delete(req: Request, res: Response) {
+        const { id } = req.params;
+
+        if (!id) return res.status(400).json({ error: "Preencha o identificador do produto!" });
+
+        const product = await Product.findOneBy({ id: Number(id) });
+
+        if (!product) return res.status(400).json({ error: 'Produto não encontrado!' });
+
+        await product.remove();
 
         return res.status(200).json();
     }

@@ -21,7 +21,7 @@ export default class CheckListSales extends BaseEntity {
     @Column({ default: 0 })
     currentStep!: Number
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { nullable: true })
     userIdTec?: User 
 
     @OneToMany(() => StepVerify, step => step.checklistsales)

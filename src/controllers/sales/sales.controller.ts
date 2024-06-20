@@ -7,7 +7,7 @@ import Checklist from "../../models/checklist/checklist.entity";
 
 export default class SalesController {
     static async create(req: Request, res: Response) {
-        const { userId } = { userId: 1 };
+        const { userId } = req.headers;
         const { productId } = req.params;
         const { salesNumber, transporterId } = req.body;
 
